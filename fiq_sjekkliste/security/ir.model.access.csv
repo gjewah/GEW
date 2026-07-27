@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_sjekkliste_user,fiq.sjekkliste.user,model_fiq_sjekkliste,base.group_user,1,1,1,0
-access_fiq_sjekkliste_manager,fiq.sjekkliste.manager,model_fiq_sjekkliste,project.group_project_manager,1,1,1,1
-access_fiq_sjekkliste_punkt_user,fiq.sjekkliste.punkt.user,model_fiq_sjekkliste_punkt,base.group_user,1,1,1,0
-access_fiq_sjekkliste_punkt_manager,fiq.sjekkliste.punkt.manager,model_fiq_sjekkliste_punkt,project.group_project_manager,1,1,1,1
-access_fiq_sjekkliste_portal,fiq.sjekkliste.portal,model_fiq_sjekkliste,base.group_portal,1,0,0,0
-access_fiq_sjekkliste_punkt_portal,fiq.sjekkliste.punkt.portal,model_fiq_sjekkliste_punkt,base.group_portal,1,1,0,0

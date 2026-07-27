@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_pos_rapport_user,fiq.pos.rapport.user,model_fiq_pos_rapport,point_of_sale.group_pos_user,1,0,1,0
-access_fiq_pos_rapport_manager,fiq.pos.rapport.manager,model_fiq_pos_rapport,point_of_sale.group_pos_manager,1,1,1,0
-access_fiq_pos_rapport_linje_user,fiq.pos.rapport.linje.user,model_fiq_pos_rapport_linje,point_of_sale.group_pos_user,1,0,1,0
-access_fiq_pos_rapport_linje_manager,fiq.pos.rapport.linje.manager,model_fiq_pos_rapport_linje,point_of_sale.group_pos_manager,1,1,1,0
