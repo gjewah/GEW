@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_gui_ai_assistent_user,fiq.gui.ai.assistent.user,model_fiq_gui_ai_assistent,base.group_user,1,0,0,0
-access_fiq_gui_ai_assistent_mgm,fiq.gui.ai.assistent.mgm,model_fiq_gui_ai_assistent,fiq_gui_ai.group_ai_mgm,1,1,1,0

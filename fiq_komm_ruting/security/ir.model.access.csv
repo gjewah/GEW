@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_komm_profil_user,fiq.komm.profil bruker,model_fiq_komm_profil,base.group_user,1,0,0,0
-access_fiq_komm_profil_manager,fiq.komm.profil ansvarlig,model_fiq_komm_profil,base.group_system,1,1,1,1

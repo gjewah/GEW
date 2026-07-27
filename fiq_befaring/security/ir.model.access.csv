@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_befaring_user,fiq.befaring bruker,model_fiq_befaring,base.group_user,1,1,1,0
-access_fiq_befaring_manager,fiq.befaring ansvarlig,model_fiq_befaring,sales_team.group_sale_manager,1,1,1,1
-access_fiq_befaring_rom_user,fiq.befaring.rom bruker,model_fiq_befaring_rom,base.group_user,1,1,1,1
-access_fiq_befaring_rom_manager,fiq.befaring.rom ansvarlig,model_fiq_befaring_rom,sales_team.group_sale_manager,1,1,1,1
-access_fiq_befaring_funn_user,fiq.befaring.funn bruker,model_fiq_befaring_funn,base.group_user,1,1,1,1
-access_fiq_befaring_funn_manager,fiq.befaring.funn ansvarlig,model_fiq_befaring_funn,sales_team.group_sale_manager,1,1,1,1

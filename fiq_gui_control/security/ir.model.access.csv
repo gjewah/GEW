@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_gui_control_config_user,fiq.gui.control.config.user,model_fiq_gui_control_config,fiq_gui_control.group_user,1,1,1,0
-access_fiq_gui_control_config_admin,fiq.gui.control.config.admin,model_fiq_gui_control_config,fiq_gui_control.group_admin,1,1,1,1
-access_fiq_gui_suggestion_user,fiq.gui.suggestion.user,model_fiq_gui_suggestion,fiq_gui_control.group_user,1,0,1,0
-access_fiq_gui_suggestion_admin,fiq.gui.suggestion.admin,model_fiq_gui_suggestion,fiq_gui_control.group_admin,1,1,1,1

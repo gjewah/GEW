@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_msg_state_user,fiq.meldingssenter.state bruker,model_fiq_meldingssenter_state,fiq_gui_epost.group_user,1,1,1,1
-access_fiq_msg_note_user,fiq.meldingssenter.note bruker,model_fiq_meldingssenter_note,fiq_gui_epost.group_user,1,1,1,1
-access_fiq_msg_pinn_user,fiq.meldingssenter.pinn bruker,model_fiq_meldingssenter_pinn,fiq_gui_epost.group_user,1,1,1,1
-access_fiq_partner_relation_user,fiq.partner.relation bruker,model_fiq_partner_relation,fiq_gui_epost.group_user,1,1,1,1
-access_fiq_komm_regel_user,fiq.komm.regel bruker,model_fiq_komm_regel,fiq_gui_epost.group_user,1,1,1,1
