@@ -92,7 +92,7 @@ def _konto(account_id, grouping=None, std_account_id='', desc='Test',
     </Account>"""
 
 
-@tagged('post_install', '-at_install')
+@tagged('post_install', '-at_install', 'fiq')
 class TestNoSaftImport(AccountTestInvoicingCommon):
 
     @classmethod
