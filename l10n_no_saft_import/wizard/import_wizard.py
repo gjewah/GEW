@@ -1,4 +1,6 @@
 # Part of FIQ AI. Norsk SAF-T Financial 1.30 import.
+from typing import ClassVar
+
 from odoo import Command, models
 
 
@@ -8,7 +10,7 @@ class AccountSaftImportWizard(models.TransientModel):
     # GroupingCategory (norsk SAF-T / NS 4102) -> Odoo account_type.
     # Verifisert mot 19 SAF-T-filer fra PowerOffice Go (4 selskaper, 2022-2026),
     # 1086 kontorader, 14 distinkte kategorier - alle dekket, 0 fallback.
-    NO_GROUPING_CATEGORY_MAP = {
+    NO_GROUPING_CATEGORY_MAP: ClassVar[dict] = {
         'balanseverdiForAnleggsmiddel': 'asset_fixed',
         'balanseverdiForOmloepsmiddel': 'asset_current',
         'egenkapital': 'equity',
@@ -26,7 +28,7 @@ class AccountSaftImportWizard(models.TransientModel):
     }
 
     # AnalysisType i norsk SAF-T (POG) -> analytisk plan-navn i Odoo
-    NO_ANALYSIS_TYPE_MAP = {
+    NO_ANALYSIS_TYPE_MAP: ClassVar[dict] = {
         'P': 'Prosjekt',
         'A': 'Avdeling',
     }
@@ -37,6 +39,30 @@ class AccountSaftImportWizard(models.TransientModel):
         res = super()._get_account_types()
         res.update({'GL': 'asset_current'})
         return res
+
+    # ------------------------------------------------------------------
+    # Kompatibilitet med basemodulen (account_saft_import) paa Odoo 19
+    # ------------------------------------------------------------------
+    def _prepare_partner_data(self, tree):
+        """Basen (account_saft_import) setter res.partner.mobile fra SAF-T MobilePhone.
+        Feltet ble FJERNET fra res.partner i Odoo 19 -> ValueError 'Invalid field mobile'
+        naar postene lastes. Stripper feltet defensivt hvis modellen ikke har det.
+        """
+        partners_to_create, partner_mapping_ids = super()._prepare_partner_data(tree)
+        if 'mobile' not in self.env['res.partner']._fields:
+            for vals in partners_to_create.values():
+                for cmd in vals.get('child_ids') or []:
+                    # Command.create -> (0, 0, {vals})
+                    if isinstance(cmd, (list, tuple)) and len(cmd) == 3 and isinstance(cmd[2], dict):
+                        cmd[2].pop('mobile', None)
+        return partners_to_create, partner_mapping_ids
+
+    def _prepare_opening_balance_move(self, tree, map_accounts):
+        """Basen returnerer None (ikke {}) naar det ikke finnes balanseforskjell.
+        _get_data gjoer da data['account.move'] = None og krasjer paa .update().
+        Normaliser til tom dict.
+        """
+        return super()._prepare_opening_balance_move(tree, map_accounts) or {}
 
     # ------------------------------------------------------------------
     # Kontoplan
@@ -164,9 +190,30 @@ class AccountSaftImportWizard(models.TransientModel):
         return mapping
 
     def _prepare_journal_data(self, tree, default_currency, map_accounts, map_taxes, map_currencies, map_partners):
-        """Bygger analytisk kart FOER bilagene leses, saa _prepare_move_data kan bruke det."""
-        self._no_saft_analytic_map = self._no_saft_prepare_analytic(tree)
-        return super()._prepare_journal_data(tree, default_currency, map_accounts, map_taxes, map_currencies, map_partners)
+        """Bygger analytisk kart FOER bilagene leses, saa _prepare_move_data kan bruke det.
+
+        Kartet foeres via context, IKKE som instansattributt: Odoo-recordsets har
+        __slots__ og kan ikke baere vilkaarlige attributter (ellers AttributeError).
+        Basemetoden kaller self._prepare_move_data paa samme self, saa konteksten propagerer dit.
+        """
+        # POGs JournalID er en 15-tegns hash (alle med prefiks '8dee3'). Odoo journal.code er
+        # maks 5 tegn -> avkortes til samme '8dee3' og KOLLIDERER paa tvers av aar ved fler-aars
+        # import ('Journal codes must be unique per company'). Sett en kort, unik kode per aar:
+        # SAF<YY>. Aaret gjoer ogsaa move-xml_id unik paa tvers av aarsfiler, siden POG gjenbruker
+        # TransactionID per aar.
+        nsmap = self._get_cleaned_namespace(tree)
+        yn = tree.find('.//saft:PeriodStartYear', namespaces=nsmap)
+        year = yn.text.strip() if (yn is not None and yn.text) else None
+        if year:
+            for j in tree.findall('.//saft:Journal', namespaces=nsmap):
+                jid = j.find('saft:JournalID', namespaces=nsmap)
+                if jid is not None and jid.text:
+                    jid.text = f'SAF{year[-2:]}'
+
+        analytic_map = self._no_saft_prepare_analytic(tree)
+        wiz = self.with_context(no_saft_analytic_map=analytic_map)
+        return super(AccountSaftImportWizard, wiz)._prepare_journal_data(
+            tree, default_currency, map_accounts, map_taxes, map_currencies, map_partners)
 
     def _prepare_move_data(self, journal_tree, default_currency, saft_journal_code, journal_id,
                            map_accounts, map_taxes, map_currencies, map_partners):
@@ -175,11 +222,30 @@ class AccountSaftImportWizard(models.TransientModel):
         Generisk modul ignorerer <Analysis>. Vi lar den bygge bilagene, og beriker
         linjene etterpaa ved aa lese Analysis-blokkene i samme rekkefoelge.
         """
+        # Norsk POG gjenbruker TransactionID baade paa tvers av OG innen samme periode
+        # (verifisert: ulike bilag, samme ID). Basen bruker (journal, TransactionID) som
+        # xml_id-noekkel og OVERSKRIVER kolliderende bilag -> STILLE DATATAP. Gjoer ID-en
+        # unik med Period + loepenummer FOER basen leser treet. Berikelsen nedenfor leser
+        # samme (modifiserte) tre, saa noeklene matcher fortsatt. Stabil for samme fil
+        # (rekkefoelge-basert) -> idempotent ved gjen-import.
+        nsmap = self._get_cleaned_namespace(journal_tree)
+        seen = {}
+        for move_node in journal_tree.findall('saft:Transaction', namespaces=nsmap):
+            tid_node = move_node.find('saft:TransactionID', namespaces=nsmap)
+            if tid_node is None or not tid_node.text:
+                continue
+            per_node = move_node.find('saft:Period', namespaces=nsmap)
+            per = per_node.text if (per_node is not None and per_node.text) else '0'
+            key = (tid_node.text, per)
+            n = seen.get(key, 0) + 1
+            seen[key] = n
+            tid_node.text = f'{tid_node.text}/{per}' if n == 1 else f'{tid_node.text}/{per}.{n}'
+
         moves = super()._prepare_move_data(
             journal_tree, default_currency, saft_journal_code, journal_id,
             map_accounts, map_taxes, map_currencies, map_partners,
         )
-        analytic_map = getattr(self, '_no_saft_analytic_map', None)
+        analytic_map = self.env.context.get('no_saft_analytic_map')
         if not analytic_map:
             return moves
 
