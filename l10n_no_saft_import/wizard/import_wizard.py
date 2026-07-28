@@ -64,6 +64,33 @@ class AccountSaftImportWizard(models.TransientModel):
         """
         return super()._prepare_opening_balance_move(tree, map_accounts) or {}
 
+    def _prepare_tax_data(self, tree):
+        """Basen oppretter 'SAF-T taxes'-gruppen UTEN company_id -> den havner paa
+        brukerens env.company, IKKE wizardens company_id. Ved import til FLERE selskaper
+        finner basens company-domene-soek den ikke, og oppretter duplikater. Da har
+        `default_tax_group` flere poster og basens `.id` kaster 'Expected singleton'.
+
+        Sikre NOEYAKTIG én company-spesifikk gruppe i domenet foer super():
+          - 0 grupper  -> opprett én med riktig company_id (basen finner den, lager ingen)
+          - 2+ grupper -> dedup: flytt taxes til den eldste, slett resten
+        """
+        Group = self.env['account.tax.group']
+        domain = [*Group._check_company_domain(self.company_id), ('name', '=', 'SAF-T taxes')]
+        grupper = Group.search(domain)
+        if not grupper:
+            Group.create({
+                'name': 'SAF-T taxes',
+                'company_id': self.company_id.id,
+                'country_id': self.company_id.account_fiscal_country_id.id,
+            })
+        elif len(grupper) > 1:
+            behold = grupper[0]
+            resten = grupper[1:]
+            self.env['account.tax'].search(
+                [('tax_group_id', 'in', resten.ids)]).write({'tax_group_id': behold.id})
+            resten.unlink()
+        return super()._prepare_tax_data(tree)
+
     # ------------------------------------------------------------------
     # Kontoplan
     # ------------------------------------------------------------------

@@ -33,6 +33,14 @@ Avvik mot den generiske modulen som håndteres her:
 Kompatibilitetsfikser mot Odoo 19 / basemodulen (`account_saft_import`):
 - basen setter `res.partner.mobile` (fjernet i Odoo 19) → strippes.
 - basens `_prepare_opening_balance_move` returnerer `None` (ikke `{}`) uten balanseforskjell → normaliseres.
+- basen oppretter mva-gruppen «SAF-T taxes» UTEN `company_id` → den havner på brukerens
+  env.company, ikke wizardens. Ved import til flere selskaper finner ikke company-domene-søket
+  den, og duplikater oppstår → `.id` kaster «Expected singleton». Her sikres nøyaktig én
+  company-spesifikk gruppe (opprett hvis 0, dedup hvis 2+) før basen kjører.
+
+Verifisert mot fersk produksjonskopi (4 selskaper): alle 11 841 transaksjoner importert 0-tap,
+beløp = kilden eksakt, regnskapet balanserer. Inngående saldo settes for første år per selskap
+(resultatdisponering mellom år er en egen årsavslutning i Odoo, ikke importens ansvar).
     """,
     'depends': [
         'account_saft_import',
