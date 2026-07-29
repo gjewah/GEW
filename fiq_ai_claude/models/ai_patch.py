@@ -31,6 +31,13 @@ def _register_provider():
         ClaudeProvider.EMBEDDING_MODEL,
         dict(ClaudeProvider.EMBEDDING_CONFIG),
         list(ClaudeProvider.LLMS),
+        # Odoo 19 la til et SJETTE felt i Provider (addons/ai/utils/llm_providers.py:14,
+        # deprecated_models: list[str]). Uten det feiler modulen ved IMPORT med
+        # "Provider.__new__() missing 1 required positional argument" - og da faller
+        # hele installasjonen, ikke bare denne modulen. Odoo sender selv [] for sine
+        # egne leverandoerer. getattr med fallback saa den taaler at ClaudeProvider
+        # faar feltet senere.
+        list(getattr(ClaudeProvider, "DEPRECATED_MODELS", [])),
     ))
     _logger.info("FIQ AI Claude: registrerte leverandør '%s' med %d modeller",
                  ClaudeProvider.NAME, len(ClaudeProvider.LLMS))
