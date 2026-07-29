@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- Klient-handling: OWL-skjelettet -->
-    <record id="action_fiq_gui_rgs" model="ir.actions.client">
-        <field name="name">FIQ Regnskap</field>
-        <field name="tag">fiq_gui_rgs_dashboard</field>
-    </record>
-    <!-- Ingen topp-meny: flaten åpnes fra FIQ Hovedmeny sin sidemeny (samlende skall). -->
-</odoo>
