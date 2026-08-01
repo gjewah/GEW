@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_payslip_hri_lese,hr.payslip 2.20 HRi lesing,hr_payroll.model_hr_payslip,fiq_rgs_lonn.group_hri_lese,1,0,0,0
-access_hr_payslip_lonningsansvarlig,hr.payslip lønningsansvarlig lesing,hr_payroll.model_hr_payslip,fiq_rgs_lonn.group_lonningsansvarlig,1,0,0,0
-access_hr_payslip_daglig_leder,hr.payslip daglig leder lesing,hr_payroll.model_hr_payslip,fiq_rgs_lonn.group_daglig_leder,1,0,0,0
-access_hr_payslip_line_hri_lese,hr.payslip.line 2.20 HRi lesing,hr_payroll.model_hr_payslip_line,fiq_rgs_lonn.group_hri_lese,1,0,0,0
-access_hr_payslip_line_lonningsansvarlig,hr.payslip.line lønningsansvarlig lesing,hr_payroll.model_hr_payslip_line,fiq_rgs_lonn.group_lonningsansvarlig,1,0,0,0
-access_hr_payslip_line_daglig_leder,hr.payslip.line daglig leder lesing,hr_payroll.model_hr_payslip_line,fiq_rgs_lonn.group_daglig_leder,1,0,0,0

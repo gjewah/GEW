@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_gui_relation_user,fiq.gui.relation user,model_fiq_gui_relation,base.group_user,1,1,1,1
-access_fiq_gui_relation_type_user,fiq.gui.relation.type user,model_fiq_gui_relation_type,base.group_user,1,0,0,0
-access_fiq_gui_relation_type_manager,fiq.gui.relation.type manager,model_fiq_gui_relation_type,base.group_partner_manager,1,1,1,1

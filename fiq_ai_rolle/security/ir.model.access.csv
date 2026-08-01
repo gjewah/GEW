@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_ai_rolle_user,fiq.ai.rolle bruker,model_fiq_ai_rolle,base.group_user,1,0,0,0
-access_fiq_ai_rolle_manager,fiq.ai.rolle ansvarlig,model_fiq_ai_rolle,base.group_system,1,1,1,1
-access_fiq_ai_rolle_qa_user,fiq.ai.rolle.qa bruker,model_fiq_ai_rolle_qa,base.group_user,1,0,0,0
-access_fiq_ai_rolle_qa_manager,fiq.ai.rolle.qa ansvarlig,model_fiq_ai_rolle_qa,base.group_system,1,1,1,1
