@@ -1,7 +1,7 @@
 # Part of FIQ. See LICENSE file for full copyright and licensing details.
 {
     "name": "FIQ AI – Claude (Anthropic) Provider",
-    "version": "19.0.1.1.2",
+    "version": "19.0.1.1.3",
     "category": "Productivity/AI",
     "summary": "Gjør Claude (Anthropic) valgbar som leverandør i Odoos native AI",
     "description": """
