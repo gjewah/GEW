@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_fiq_ai_setup_wizard_admin,fiq.ai.setup.wizard admin,model_fiq_ai_setup_wizard,base.group_system,1,1,1,1
