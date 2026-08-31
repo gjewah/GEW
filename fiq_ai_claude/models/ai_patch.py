@@ -26,18 +26,30 @@ def _register_provider():
     """Append «Anthropic (Claude)» til PROVIDERS (idempotent)."""
     if any(getattr(p, "name", None) == ClaudeProvider.NAME for p in _lp.PROVIDERS):
         return
-    _lp.PROVIDERS.append(
-        _lp.Provider(
-            ClaudeProvider.NAME,
-            ClaudeProvider.DISPLAY_NAME,
-            ClaudeProvider.EMBEDDING_MODEL,
-            dict(ClaudeProvider.EMBEDDING_CONFIG),
-            list(ClaudeProvider.LLMS),
-            # Odoo 19 la til feltet 'deprecated_models' (llm_providers.Provider NamedTuple).
-            # Claude har ingen utfasede modeller aa deklarere -> tom liste.
-            list(getattr(ClaudeProvider, "DEPRECATED_MODELS", [])),
-        )
-    )
+    # Bygg Provider-argumentene ROBUST mot Odoos NamedTuple-felt, i deklarert
+    # rekkefolge. Odoo har utvidet Provider to ganger (deprecated_models i 19.0,
+    # response_style_to_llm_model_and_reasoning 31.08.2026 — sistnevnte felte
+    # HELE fiqas + sdvg Production i natt). Ved a lese _lp.Provider._fields og
+    # fylle KJENTE felt (ukjente -> None) kan et nytt Odoo-felt aldri mer felle
+    # hele modulen (og dermed hele basen). Ett nytt felt = legg en linje her.
+    _kjente = {
+        "name": ClaudeProvider.NAME,
+        "display_name": ClaudeProvider.DISPLAY_NAME,
+        "embedding_model": ClaudeProvider.EMBEDDING_MODEL,
+        "embedding_config": dict(ClaudeProvider.EMBEDDING_CONFIG),
+        "llms": list(ClaudeProvider.LLMS),
+        "deprecated_models": list(getattr(ClaudeProvider, "DEPRECATED_MODELS", [])),
+        # Odoo slaar KUN opp dette naar en modell er deprecated (tomt for Claude),
+        # men NamedTuple-konstruktoren krever at feltet finnes. Tre stiler
+        # (analytical/balanced/creative) -> (Claude-modell, resonneringsnivaa).
+        "response_style_to_llm_model_and_reasoning": {
+            "analytical": ("claude-opus-4-8", "medium"),
+            "balanced": ("claude-sonnet-5", "low"),
+            "creative": ("claude-haiku-4-5", "low"),
+        },
+    }
+    _args = [_kjente.get(_felt, None) for _felt in _lp.Provider._fields]
+    _lp.PROVIDERS.append(_lp.Provider(*_args))
     _logger.info(
         "FIQ AI Claude: registrerte leverandør '%s' med %d modeller",
         ClaudeProvider.NAME,
